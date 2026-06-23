@@ -22,7 +22,7 @@ public class FirstTest {
     }
 
     @Test
-    void shouldOpenGoogle() {
+    public void shouldOpenGoogle() {
         page.navigate("https://www.google.com");
         Assertions.assertTrue(page.title().contains("Google"));
     }
