@@ -8,6 +8,7 @@ public class FirstTest {
     static Browser browser;
     BrowserContext context;
     Page page;
+    ScreenshotSteps steps;
 
     @BeforeAll
     static void launchBrowser() {
@@ -16,15 +17,19 @@ public class FirstTest {
     }
 
     @BeforeEach
-    void createContext() {
+    void createContext(TestInfo testInfo) {
         context = browser.newContext();
         page = context.newPage();
+        steps = new ScreenshotSteps(page, testInfo.getDisplayName());
     }
 
     @Test
     public void shouldOpenGoogle() {
-        page.navigate("https://www.google.com");
-        Assertions.assertTrue(page.title().contains("Google"));
+        steps.run("Google sayfasını aç", () ->
+                page.navigate("https://www.google.com"));
+
+        steps.run("Sayfa başlığını doğrula", () ->
+                Assertions.assertTrue(page.title().contains("Google")));
     }
 
     @AfterEach
