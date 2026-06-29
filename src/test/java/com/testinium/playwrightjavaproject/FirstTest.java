@@ -1,45 +1,38 @@
 package com.testinium.playwrightjavaproject;
 
-import com.microsoft.playwright.*;
-import org.junit.jupiter.api.*;
+import com.microsoft.playwright.Page;
+import com.testinium.playwright.screenshot.TestiniumPlaywright;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInfo;
 
 public class FirstTest {
-    static Playwright playwright;
-    static Browser browser;
-    BrowserContext context;
-    Page page;
-    ScreenshotSteps steps;
-
-    @BeforeAll
-    static void launchBrowser() {
-        playwright = Playwright.create();
-        browser = playwright.chromium().launch(new BrowserType.LaunchOptions().setHeadless(true));
-    }
+    private TestiniumPlaywright testinium;
+    private Page page;
 
     @BeforeEach
-    void createContext(TestInfo testInfo) {
-        context = browser.newContext();
-        page = context.newPage();
-        steps = new ScreenshotSteps(page, testInfo.getDisplayName());
+    void launchBrowser(TestInfo testInfo) {
+        testinium = TestiniumPlaywright.launch(testInfo.getDisplayName());
+        page = testinium.page();
     }
 
     @Test
-    public void shouldOpenGoogle() {
-        steps.run("Google sayfasını aç", () ->
-                page.navigate("https://www.google.com"));
+    public void shouldCaptureActionsWithoutStepNames() {
+        page.setContent("<label>E-posta <input id='email'></label>"
+                + "<button id='login'>Giriş yap</button>");
+        page.getByLabel("E-posta").fill("user@test.com");
+        page.locator("#login").click();
 
-        steps.run("Sayfa başlığını doğrula", () ->
-                Assertions.assertTrue(page.title().contains("Google")));
+        Assertions.assertEquals("user@test.com",
+                page.locator("#email").inputValue());
     }
 
     @AfterEach
-    void closeContext() {
-        context.close();
-    }
-
-    @AfterAll
-    static void closeBrowser() {
-        browser.close();
-        playwright.close();
+    void closeBrowser() {
+        if (testinium != null) {
+            testinium.close();
+        }
     }
 }
