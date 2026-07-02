@@ -25,7 +25,7 @@ class FirstTest {
 
         browser = playwright.chromium().launch(
                 new BrowserType.LaunchOptions()
-                        .setHeadless(false)
+                        .setHeadless(true)
         );
     }
 
