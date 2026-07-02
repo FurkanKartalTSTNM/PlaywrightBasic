@@ -20,7 +20,7 @@ class FirstTest {
     private Path tracePath;
 
     @BeforeAll
-    static public void launchBrowser() {
+    static void launchBrowser() {
         playwright = Playwright.create();
 
         browser = playwright.chromium().launch(
@@ -30,7 +30,7 @@ class FirstTest {
     }
 
     @BeforeEach
-    public void createContext(TestInfo testInfo) throws IOException {
+    void createContext(TestInfo testInfo) throws IOException {
         String testName = sanitize(testInfo.getDisplayName());
 
         Files.createDirectories(Path.of("trace"));
@@ -162,7 +162,7 @@ class FirstTest {
         });
     }
 
-    private public void step(String stepName, Runnable action) {
+    private void step(String stepName, Runnable action) {
         context.tracing().group(stepName);
 
         try {
@@ -173,7 +173,7 @@ class FirstTest {
     }
 
     @AfterEach
-    public void closeContext() {
+    void closeContext() {
         if (context == null) {
             return;
         }
@@ -190,7 +190,7 @@ class FirstTest {
     }
 
     @AfterAll
-    static public void closeBrowser() {
+    static void closeBrowser() {
         try {
             if (browser != null) {
                 browser.close();
