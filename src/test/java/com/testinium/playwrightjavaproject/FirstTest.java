@@ -59,7 +59,7 @@ class FirstTest {
     }
 
     @Test
-    void shouldOpenGoogle() {
+    public void shouldOpenGoogle() {
         step("Google sayfasını aç", () ->
                 page.navigate("https://www.google.com"));
 
