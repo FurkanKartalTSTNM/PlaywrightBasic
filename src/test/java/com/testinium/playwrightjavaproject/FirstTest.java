@@ -59,7 +59,35 @@ class FirstTest {
     }
 
     @Test
-    public void shouldOpenGoogle() {
+    public void shouldOpenGoogle1() {
+        step("Google sayfasını aç", () ->
+                page.navigate("https://www.google.com"));
+
+        step("Sayfa başlığını doğrula", () ->
+                Assertions.assertTrue(page.title().contains("Google")));
+    }
+
+    @Test
+    public void shouldOpenGoogle2() {
+        step("Google sayfasını aç", () ->
+                page.navigate("https://www.google.com"));
+
+        step("Sayfa başlığını doğrula", () ->
+                Assertions.assertTrue(page.title().contains("Google")));
+    }
+
+
+    @Test
+    public void shouldOpenGoogle3() {
+        step("Google sayfasını aç", () ->
+                page.navigate("https://www.google.com"));
+
+        step("Sayfa başlığını doğrula", () ->
+                Assertions.assertTrue(page.title().contains("Google")));
+    }
+
+    @Test
+    public void shouldOpenGoogle4() {
         step("Google sayfasını aç", () ->
                 page.navigate("https://www.google.com"));
 
