@@ -8,29 +8,37 @@ import org.junit.jupiter.api.*;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-@TestInstance(TestInstance.Lifecycle.PER_CLASS)
-public class FirstTest {
+
+class FirstTest {
 
     private static Playwright playwright;
     private static Browser browser;
-    
+
     private BrowserContext context;
     private Page page;
     private ScreenshotSession screenshots;
     private Path tracePath;
 
     @BeforeAll
-    void launchBrowserAndStartTrace() throws IOException {
+    static void launchBrowser() {
         playwright = Playwright.create();
 
-        browser = playwright.chromium().launch(
-                new BrowserType.LaunchOptions().setHeadless(true)
+        browser = playwright.webkit().launch(
+                new BrowserType.LaunchOptions()
+                        .setHeadless(true)
         );
+    }
+
+    @BeforeEach
+    void createContext(TestInfo testInfo) throws IOException {
+        String testName = sanitize(testInfo.getDisplayName());
+
+        Files.createDirectories(Path.of("trace"));
+        tracePath = Path.of("trace", testName + ".zip");
 
         context = browser.newContext();
 
-        Files.createDirectories(Path.of("trace"));
-
+        // Page oluşturulmadan önce tracing başlatılmalı.
         context.tracing().start(
                 new Tracing.StartOptions()
                         .setScreenshots(true)
@@ -39,20 +47,14 @@ public class FirstTest {
         );
 
         page = context.newPage();
-    }
-
-    @BeforeEach
-    void prepareTest(TestInfo testInfo) {
-        String testName = sanitize(testInfo.getDisplayName());
-
-        // Trace içinde testleri ayrıca gruplar.
-        context.tracing().group(testName);
 
         screenshots = ScreenshotSession.builder(page, testName)
-                .config(ScreenshotConfig.builder()
-                        .outputDirectory(Path.of("screenshot"))
-                        .fullPage(true)
-                        .build())
+                .config(
+                        ScreenshotConfig.builder()
+                                .outputDirectory(Path.of("screenshot"))
+                                .fullPage(true)
+                                .build()
+                )
                 .build();
     }
 
@@ -171,21 +173,32 @@ public class FirstTest {
     }
 
     @AfterEach
-    void finishTest() {
-        context.tracing().groupEnd();
-    }
+    void closeContext() {
+        if (context == null) {
+            return;
+        }
 
-    @AfterAll
-    void stopTraceAndCloseBrowser() {
         try {
+            // Context kapanmadan önce trace kaydedilmeli.
             context.tracing().stop(
                     new Tracing.StopOptions()
-                            .setPath(Path.of("trace/all-tests.zip"))
+                            .setPath(tracePath)
             );
         } finally {
             context.close();
-            browser.close();
-            playwright.close();
+        }
+    }
+
+    @AfterAll
+    static void closeBrowser() {
+        try {
+            if (browser != null) {
+                browser.close();
+            }
+        } finally {
+            if (playwright != null) {
+                playwright.close();
+            }
         }
     }
 
