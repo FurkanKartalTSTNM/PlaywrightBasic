@@ -23,7 +23,7 @@ class FirstTest {
     static void launchBrowser() {
         playwright = Playwright.create();
 
-        browser = playwright.webkit().launch(
+        browser = playwright.chromium().launch(
                 new BrowserType.LaunchOptions()
                         .setHeadless(true)
         );
