@@ -26,7 +26,6 @@ class FirstTest {
         browser = playwright.webkit().launch(
                 new BrowserType.LaunchOptions()
                         .setHeadless(true)
-            demooo
         );
     }
 
